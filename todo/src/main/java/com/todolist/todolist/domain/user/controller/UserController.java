@@ -3,6 +3,7 @@ package com.todolist.todolist.domain.user.controller;
 import com.todolist.todolist.domain.user.dto.request.UserRequest;
 import com.todolist.todolist.domain.user.dto.response.UserResponse;
 import com.todolist.todolist.domain.user.service.UserService;
+import com.todolist.todolist.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,5 +30,10 @@ public class UserController {
     public ResponseEntity<String> reissueToken(@RequestHeader("Authorization") String accessToken, @CookieValue("refreshToken") String refreshToken) {
         String newAccessToken = userService.reissue(accessToken, refreshToken);
         return ResponseEntity.status(HttpStatus.OK).body(newAccessToken);
+    }
+
+    @PostMapping("/logout")
+    public void logout(@RequestHeader("Authorization") String accessToken, @CookieValue("refreshToken") String refreshToken) {
+        userService.logout(accessToken, refreshToken);
     }
 }
