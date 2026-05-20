@@ -105,6 +105,16 @@ public class JwtTokenProvider {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 
+    //
+    public String getUsername(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key) // 아까 설정한 서명 키
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject(); // 보통 subject(sub) 필드에 유저네임을 넣습니다.
+    }
+
     // ⭐ 7. 추가: 헤더에서 토큰을 추출하는 도구 (필터에서 필수!)
     public String resolveAccessToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
