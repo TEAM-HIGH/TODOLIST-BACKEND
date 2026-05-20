@@ -75,6 +75,33 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
+    @Transactional
+    public void logout(String accessToken, String refreshToken) {
+        // 1. Access Token 유효성 검증
+        // 일단 받고 검사해야함
+        if (!jwtTokenProvider.validateToken(accessToken)) {
+            log.warn("이미 만료되었거나 잘못된 Access Token으로 로그아웃을 시도했습니다.");
+        }
+
+        // 2. Refresh Token 유효성 검증
+        // 이유는
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new IllegalArgumentException("유효하지 않은 Refresh Token입니다.");
+        }
+
+        // 3. Refresh Token에서 유저 정보(Username) 추출
+        String username = jwtTokenProvider.getUsername(refreshToken);
+
+        if (redisTemplate.opsForValue().get(username) != null) {
+            redisTemplate.delete(username);
+            log.info("유저 [{}]의 Refresh Token을 Redis에서 삭제했습니다.", username);
+        } else {
+            log.warn("유저 [{}]의 Refresh Token이 이미 Redis에 존재하지 않습니다.", username);
+        }
+
+        // 5. (선택) Access Token 블랙리스트 추가 로직을 여기에 작성할 수 있습니다.
+    }
+
     public String reissue(String accessToken, String refreshToken) {
         // 1. Refresh Token 자체의 유효성 검사
 //        if (!jwtTokenProvider.validateToken(refreshToken)) {
