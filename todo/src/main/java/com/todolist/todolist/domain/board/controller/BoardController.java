@@ -37,8 +37,4 @@ public class BoardController {
         boardService.deleteBoard(board_id);
     }
 
-//    @GetMapping("/health")
-//    public String healthCheck() {
-//        return "OK";
-//    }
 }
