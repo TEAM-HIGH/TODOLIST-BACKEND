@@ -1,14 +1,13 @@
 spring:
   application:
-    name : backend
+    name: backend
   datasource:
-    # 1. dbeaver의 localhost:3306 뒤에 /test_security를 붙입니다.
-    url: jdbc:mysql://localhost:3306/todo_db?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    # 2. 본인의 mysql 계정 (보통 root)
-    username: root
-    # 3. 본인의 mysql 비밀번호 (dbeaver 접속 시 사용한 것)
-    password: kyokyo329@
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 1. URL, Username, Password를 모두 Render에서 주입받도록 이름표(${ })로 변경합니다.
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    # 2. Driver를 MySQL에서 PostgreSQL로 변경합니다.
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -17,12 +16,16 @@ spring:
       hibernate:
         default_batch_fetch_size: 100
         format_sql: true
+        # 3. Hibernate가 PostgreSQL 문법을 쓰도록 Dialect를 명시해 줍니다.
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   data:
     redis:
-      host: localhost
-      port: 6379
+      # Render 환경에서는 레디스도 로컬(localhost)을 쓸 수 없으므로 이름표로 처리합니다.
+      # (만약 레디스를 안 쓰신다면 이 부분을 주석 처리하거나 빼셔야 에러가 안 납니다!)
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 server:
-  port: 8080
+  port: ${PORT:8080} # Render가 열어주는 포트를 자동으로 잡도록 설정
 jwt:
   secret:
     key: ${JWT_SECRET}
